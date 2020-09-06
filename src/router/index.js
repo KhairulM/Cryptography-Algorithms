@@ -1,6 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Home from "../views/Home.vue";
+import Home from "@/views/Home.vue";
 
 Vue.use(VueRouter);
 
@@ -15,13 +15,29 @@ const routes = [
         path: "vigenere-cipher",
         component: () => import("@/components/VigenereCipher"),
         name: "vigenereCipher"
+      },
+      {
+        path: "playfair-cipher",
+        component: () => import("@/components/PlayfairCipher"),
+        name: "playfairCipher"
+      },
+      {
+        path: "affine-cipher",
+        component: () => import("@/components/AffineCipher"),
+        name: "affineCipher"
+      },
+      {
+        path: "hill-cipher",
+        component: () => import("@/components/HillCipher"),
+        name: "hillCipher"
       }
     ]
   }
 ];
 
 const router = new VueRouter({
-  routes
+  routes,
+  mode: "history"
 });
 
 export default router;

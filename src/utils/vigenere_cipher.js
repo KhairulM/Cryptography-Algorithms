@@ -1,4 +1,8 @@
 export function VigenereCipherEncrypt(plaintext, keystring) {
+  // sanity check
+  plaintext = plaintext.trim();
+  keystring = keystring.trim();
+
   // check if key length is equal to plaintext length
   if (keystring.length < plaintext.length) {
     for (let i = 0; i < plaintext.length; i++) {
@@ -11,18 +15,25 @@ export function VigenereCipherEncrypt(plaintext, keystring) {
   plaintext = plaintext.toLowerCase();
   let ciphertext = "";
 
-  for (let i = 0; i < plaintext.length; i++) {
-    let cipherCharCode =
-      (plaintext.charCodeAt(i) + keystring.charCodeAt(i) - 194) % 26;
-    cipherCharCode += 97;
-
-    ciphertext += String.fromCharCode(cipherCharCode);
+  let plaintextSplit = plaintext.split(" ");
+  for (let plaintextSub of plaintextSplit) {
+    for (let i = 0; i < plaintextSub.length; i++) {
+      let cipherCharCode =
+        (plaintextSub.charCodeAt(i) + keystring.charCodeAt(i) - 194) % 26;
+      cipherCharCode += 97;
+  
+      ciphertext += String.fromCharCode(cipherCharCode);
+    }
   }
 
   return ciphertext.toUpperCase();
 }
 
 export function VigenereCipherDecrypt(ciphertext, keystring) {
+  // sanity check
+  ciphertext = ciphertext.trim();
+  keystring = keystring.trim();
+
   // check if key length is equal to plaintext length
   if (keystring.length < ciphertext.length) {
     for (let i = 0; i < ciphertext.length; i++) {
