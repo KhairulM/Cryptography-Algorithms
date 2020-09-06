@@ -11,13 +11,13 @@ const routes = [
     component: Home,
     redirect: "/vigenere-cipher",
     children: [
-        {
-            path: "vigenere-cipher",
-            component: () => import("@/components/VigenereCipher"),
-            name: "vigenereCipher"
-        }
+      {
+        path: "vigenere-cipher",
+        component: () => import("@/components/VigenereCipher"),
+        name: "vigenereCipher"
+      }
     ]
-  },
+  }
 ];
 
 const router = new VueRouter({
