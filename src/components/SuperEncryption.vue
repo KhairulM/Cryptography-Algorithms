@@ -1,8 +1,9 @@
 <template>
-  <div class="playfair-cipher">
-    <h3>Playfair Cipher</h3>
+  <div class="super-encryption">
+    <h3>Super Encryption</h3>
+    <p>Algoritma yang digunakan adalah <i>Standard Vigenere Cipher</i> + Cipher Transposisi matriks dengan <i>n = 2</i></p>
     <div class="keystring-container">
-      <p>Cipher Key:</p>
+      <p>Vigenere Cipher Key:</p>
       <input
         v-model="keystring"
         class="keystring-input"
@@ -15,14 +16,18 @@
 
 <script>
 import { mapGetters, mapMutations } from "vuex";
+import { 
+  VigenereCipherEncrypt,
+  VigenereCipherDecrypt
+} from "@/utils/vigenere_cipher";
+import { 
+  TranspositionCipherEncrypt,
+  TranspositionCipherDecrypt
+} from "@/utils/transposition_cipher";
 import { removeWhiteSpace } from "@/utils/preprocessor";
-import {
-  PlayfairCipherEncrypt,
-  PlayfairCipherDecrypt
-} from "@/utils/playfair_cipher";
 
 export default {
-  name: "PlayfairCipher",
+  name: "SuperEncryption",
   data() {
     return {
       keystring: "",
@@ -39,20 +44,24 @@ export default {
     isProcessing(newVal) {
       if (newVal) {
         if (this.isEncrypt) {
-          this.setCiphertext(PlayfairCipherEncrypt(this.getPlaintext(), removeWhiteSpace(this.keystring)));
+          let vigRes = VigenereCipherEncrypt(this.getPlaintext(), removeWhiteSpace(this.keystring));
+          let transRes = TranspositionCipherEncrypt(vigRes);
+          this.setCiphertext(transRes);
         } else {
-          this.setPlaintext(PlayfairCipherDecrypt(this.getCiphertext(), removeWhiteSpace(this.keystring)));
+          let transRes = TranspositionCipherDecrypt(this.getCiphertext())
+          let vigRes = VigenereCipherDecrypt(transRes, removeWhiteSpace(this.keystring));
+          this.setPlaintext(vigRes);
         }
 
-        this.endProcessing()
+        this.endProcessing();
       }
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
-.playfair-cipher {
+.super-encryption {
   .keystring-container {
     display: flex;
     align-items: center;

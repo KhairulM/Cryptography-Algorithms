@@ -8,13 +8,13 @@ const store = new Vuex.Store({
     plaintext: "",
     ciphertext: "",
     encrypt: null,
-    processing: false
+    processing: false,
   },
   getters: {
     getPlaintext: state => state.plaintext,
     getCiphertext: state => state.ciphertext,
     isProcessing: state => state.processing,
-    isEncrypt: state => state.encrypt
+    isEncrypt: state => state.encrypt,
   },
   mutations: {
     setPlaintext(state, plaintext) {
@@ -31,7 +31,7 @@ const store = new Vuex.Store({
     },
     setEncrypt(state, encrypt) {
       state.encrypt = encrypt;
-    }
+    },
   }
 });
 

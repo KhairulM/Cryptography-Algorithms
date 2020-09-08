@@ -5,6 +5,7 @@
       <router-link to="/playfair-cipher">Playfair Cipher</router-link>
       <router-link to="/affine-cipher">Affine Cipher</router-link>
       <router-link to="/hill-cipher">Hill Cipher</router-link>
+      <router-link to="/super-encryption">Super Encryption</router-link>
     </div>
     <router-view></router-view>
     <div class="input-container">
@@ -22,7 +23,6 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import { removeWhiteSpace } from '@/utils/preprocessor';
 
 export default {
   name: "Home",
@@ -37,8 +37,8 @@ export default {
   },
   methods: {
     setPlainAndCipherText() {
-      this.$store.commit("setPlaintext", removeWhiteSpace(this.plaintext));
-      this.$store.commit("setCiphertext", removeWhiteSpace(this.ciphertext));
+      this.$store.commit("setPlaintext", this.plaintext);
+      this.$store.commit("setCiphertext", this.ciphertext);
     },
     onClickEncrypt() {
       this.ciphertext = "";
@@ -68,7 +68,7 @@ export default {
 <style lang="scss" scoped>
 .home {
   margin-top: 20px;
-  width: 36em;
+  width: 40em;
 
   .link-container {
     display: flex;

@@ -19,7 +19,7 @@ export function PlayfairCipherDecrypt(cipher, key) {
     for (let i = 0; i < cleanCipher.length; i += 2) {
         plainText += DecryptPair(cleanCipher[i] + cleanCipher[i + 1], matrix);
     }
-    return plainText;
+    return plainText.toLowerCase();
 }
 
 function CleanText(text) {
@@ -53,25 +53,31 @@ function EncryptPair(pair, matrix) {
     let pairType = GetPairType(firstID, secondID);
     switch (pairType) {
         case 0:
-            let firstCol = firstID % 5;
-            let secondCol = secondID % 5;
-            let delta = Math.abs(firstCol - secondCol);
-            if (firstCol < secondCol) {
-                encrypted += matrix[firstID + delta];
-                encrypted += matrix[secondID - delta];
-            } else {
-                encrypted += matrix[firstID - delta];
-                encrypted += matrix[secondID + delta];
+            {
+                let firstCol = firstID % 5;
+                let secondCol = secondID % 5;
+                let delta = Math.abs(firstCol - secondCol);
+                if (firstCol < secondCol) {
+                    encrypted += matrix[firstID + delta];
+                    encrypted += matrix[secondID - delta];
+                } else {
+                    encrypted += matrix[firstID - delta];
+                    encrypted += matrix[secondID + delta];
+                }
             }
             break;
         case 1:
-            let row = Math.floor(firstID / 5);
-            encrypted += matrix[(row * 5) + ((firstID + 1) % 5)];
-            encrypted += matrix[(row * 5) + ((secondID + 1) % 5)];
+            {
+                let row = Math.floor(firstID / 5);
+                encrypted += matrix[(row * 5) + ((firstID + 1) % 5)];
+                encrypted += matrix[(row * 5) + ((secondID + 1) % 5)];
+            }
             break;
         case 2:
-            encrypted += matrix[(firstID + 5) % 25];
-            encrypted += matrix[(secondID + 5) % 25];
+            {
+                encrypted += matrix[(firstID + 5) % 25];
+                encrypted += matrix[(secondID + 5) % 25];
+            }
             break;
     }
     return encrypted;
@@ -84,25 +90,31 @@ function DecryptPair(pair, matrix) {
     let pairType = GetPairType(firstID, secondID);
     switch (pairType) {
         case 0:
-            let firstCol = firstID % 5;
-            let secondCol = secondID % 5;
-            let delta = Math.abs(firstCol - secondCol);
-            if (firstCol < secondCol) {
-                encrypted += matrix[firstID + delta];
-                encrypted += matrix[secondID - delta];
-            } else {
-                encrypted += matrix[firstID - delta];
-                encrypted += matrix[secondID + delta];
+            {
+                let firstCol = firstID % 5;
+                let secondCol = secondID % 5;
+                let delta = Math.abs(firstCol - secondCol);
+                if (firstCol < secondCol) {
+                    encrypted += matrix[firstID + delta];
+                    encrypted += matrix[secondID - delta];
+                } else {
+                    encrypted += matrix[firstID - delta];
+                    encrypted += matrix[secondID + delta];
+                }
             }
             break;
         case 1:
-            let row = Math.floor(firstID / 5);
-            encrypted += matrix[(row * 5) + ((firstID + 4) % 5)];
-            encrypted += matrix[(row * 5) + ((secondID + 4) % 5)];
+            {
+                let row = Math.floor(firstID / 5);
+                encrypted += matrix[(row * 5) + ((firstID + 4) % 5)];
+                encrypted += matrix[(row * 5) + ((secondID + 4) % 5)];
+            }
             break;
         case 2:
-            encrypted += matrix[(firstID + 20) % 25];
-            encrypted += matrix[(secondID + 20) % 25];
+            {
+                encrypted += matrix[(firstID + 20) % 25];
+                encrypted += matrix[(secondID + 20) % 25];
+            }
             break;
     }
     return encrypted;

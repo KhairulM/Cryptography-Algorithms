@@ -30,7 +30,12 @@ const routes = [
         path: "hill-cipher",
         component: () => import("@/components/HillCipher"),
         name: "hillCipher"
-      }
+      },
+      {
+        path: "super-encryption",
+        component: () => import("@/components/SuperEncryption"),
+        name: "superEncryption"
+      },
     ]
   }
 ];
