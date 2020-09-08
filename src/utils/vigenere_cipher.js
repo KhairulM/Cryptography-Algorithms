@@ -1,4 +1,5 @@
 let seedrandom = require('seedrandom');
+let count = 0; // for full vigenere cipher
 
 export function VigenereCipherEncrypt(plaintext, keystring) {
   // sanity check
@@ -81,8 +82,8 @@ export function FullVigenereCipherEncrypt(plaintext, keystring) {
 
   for (let i = 0; i < plaintext.length; i++) {
     if (!charMap.has(keystring[i])) {
-      // generate alphabet permutation with keystring[i] as seed
-      let rng = seedrandom(keystring[i]);
+      // generate alphabet permutation with keystring[i] and count as seed
+      let rng = seedrandom(keystring[i] + count);
       let mapValue = character.slice();
 
       for (let j = mapValue.length-1; j > 0; j--) {
@@ -100,6 +101,9 @@ export function FullVigenereCipherEncrypt(plaintext, keystring) {
     let mapValue = charMap.get(keystring[i]);
     ciphertext += mapValue[charIdx];
   }
+
+  // increment count
+  count++;
 
   return ciphertext.toUpperCase();
 }
@@ -125,8 +129,8 @@ export function FullVigenereCipherDecrypt(ciphertext, keystring) {
 
   for (let i = 0; i < ciphertext.length; i++) {
     if (!charMap.has(keystring[i])) {
-      // generate alphabet permutation with keystring[i] as seed
-      let rng = seedrandom(keystring[i]);
+      // generate alphabet permutation with keystring[i] and count as seed
+      let rng = seedrandom(keystring[i] + (count-1));
       let mapValue = character.slice();
 
       for (let j = mapValue.length-1; j > 0; j--) {
