@@ -1,7 +1,9 @@
+let seedrandom = require('seedrandom');
+
 export function VigenereCipherEncrypt(plaintext, keystring) {
   // sanity check
-  plaintext = plaintext.trim();
-  keystring = keystring.trim();
+  plaintext = plaintext.toLowerCase();
+  keystring = keystring.toLowerCase();
 
   // check if key length is equal to plaintext length
   if (keystring.length < plaintext.length) {
@@ -12,18 +14,14 @@ export function VigenereCipherEncrypt(plaintext, keystring) {
     keystring = keystring.slice(0, plaintext.length);
   }
 
-  plaintext = plaintext.toLowerCase();
   let ciphertext = "";
 
-  let plaintextSplit = plaintext.split(" ");
-  for (let plaintextSub of plaintextSplit) {
-    for (let i = 0; i < plaintextSub.length; i++) {
-      let cipherCharCode =
-        (plaintextSub.charCodeAt(i) + keystring.charCodeAt(i) - 194) % 26;
-      cipherCharCode += 97;
-  
-      ciphertext += String.fromCharCode(cipherCharCode);
-    }
+  for (let i = 0; i < plaintext.length; i++) {
+    let cipherCharCode =
+      (plaintext.charCodeAt(i) + keystring.charCodeAt(i) - 194) % 26;
+    cipherCharCode += 97;
+
+    ciphertext += String.fromCharCode(cipherCharCode);
   }
 
   return ciphertext.toUpperCase();
@@ -31,10 +29,10 @@ export function VigenereCipherEncrypt(plaintext, keystring) {
 
 export function VigenereCipherDecrypt(ciphertext, keystring) {
   // sanity check
-  ciphertext = ciphertext.trim();
-  keystring = keystring.trim();
+  ciphertext = ciphertext.toLowerCase();
+  keystring = keystring.toLowerCase();
 
-  // check if key length is equal to plaintext length
+  // check if key length is equal to ciphertext length
   if (keystring.length < ciphertext.length) {
     for (let i = 0; i < ciphertext.length; i++) {
       keystring += keystring[i];
@@ -43,7 +41,6 @@ export function VigenereCipherDecrypt(ciphertext, keystring) {
     keystring = keystring.slice(0, ciphertext.length);
   }
 
-  ciphertext = ciphertext.toLowerCase();
   let plaintext = "";
 
   for (let i = 0; i < ciphertext.length; i++) {
@@ -56,6 +53,98 @@ export function VigenereCipherDecrypt(ciphertext, keystring) {
     }
     plainCharCode += 97;
 
+    plaintext += String.fromCharCode(plainCharCode);
+  }
+
+  return plaintext.toLowerCase();
+}
+
+
+export function FullVigenereCipherEncrypt(plaintext, keystring) {
+  // sanity check
+  plaintext = plaintext.toLowerCase();
+  keystring = keystring.toLowerCase();
+
+  // check if key length is equal to plaintext length
+  if (keystring.length < plaintext.length) {
+    for (let i = 0; i < plaintext.length; i++) {
+      keystring += keystring[i];
+    }
+  } else if (keystring.length > plaintext.length) {
+    keystring = keystring.slice(0, plaintext.length);
+  }
+
+  const character = "abcdefghijklmnopqrstuvwxyz";
+
+  let charMap = new Map();
+  let ciphertext = ""
+
+  for (let i = 0; i < plaintext.length; i++) {
+    if (!charMap.has(keystring[i])) {
+      // generate alphabet permutation with keystring[i] as seed
+      let rng = seedrandom(keystring[i]);
+      let mapValue = character.slice();
+
+      for (let j = mapValue.length-1; j > 0; j--) {
+        const rn = Math.floor(rng()*j);
+        const temp = mapValue[j];
+        mapValue = mapValue.substr(0, j) + mapValue[rn] + mapValue.substr(j+1, mapValue.length);
+        mapValue = mapValue.substr(0, rn) + temp + mapValue.substr(rn+1, mapValue.length);
+      }
+
+      // assign the mapValue to charMap
+      charMap.set(keystring[i], mapValue);
+    }
+
+    let charIdx = plaintext.charCodeAt(i) - 97;
+    let mapValue = charMap.get(keystring[i]);
+    ciphertext += mapValue[charIdx];
+  }
+
+  return ciphertext.toUpperCase();
+}
+
+export function FullVigenereCipherDecrypt(ciphertext, keystring) {
+  // sanity check
+  ciphertext = ciphertext.toLowerCase();
+  keystring = keystring.toLowerCase();
+
+  // check if key length is equal to ciphertext length
+  if (keystring.length < ciphertext.length) {
+    for (let i = 0; i < ciphertext.length; i++) {
+      keystring += keystring[i];
+    }
+  } else if (keystring.length > ciphertext.length) {
+    keystring = keystring.slice(0, ciphertext.length);
+  }
+
+  const character = "abcdefghijklmnopqrstuvwxyz";
+
+  let charMap = new Map();
+  let plaintext = ""
+
+  for (let i = 0; i < ciphertext.length; i++) {
+    if (!charMap.has(keystring[i])) {
+      // generate alphabet permutation with keystring[i] as seed
+      let rng = seedrandom(keystring[i]);
+      let mapValue = character.slice();
+
+      for (let j = mapValue.length-1; j > 0; j--) {
+        const rn = Math.floor(rng()*j);
+        const temp = mapValue[j];
+        mapValue = mapValue.substr(0, j) + mapValue[rn] + mapValue.substr(j+1, mapValue.length);
+        mapValue = mapValue.substr(0, rn) + temp + mapValue.substr(rn+1, mapValue.length);
+      }
+
+      // assign the mapValue to charMap
+      charMap.set(keystring[i], mapValue);
+    }
+
+    let cipherChar = ciphertext[i];
+    let mapValue = charMap.get(keystring[i]);
+
+    // find the index of cipherChar inside mapValue
+    let plainCharCode = mapValue.indexOf(cipherChar) + 97;
     plaintext += String.fromCharCode(plainCharCode);
   }
 

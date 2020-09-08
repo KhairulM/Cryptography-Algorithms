@@ -1,5 +1,12 @@
 <template>
   <div class="vigenere-cipher">
+    <h3>{{ `${variantStr} Vigenere Cipher` }}</h3>
+    <div class="option-container">
+      <button class="option" @click="onClickOptionStandard">Standard</button>
+      <button class="option" @click="onClickOptionFull">Full Vigenere Cipher</button>
+      <button class="option" @click="onClickOptionAutoKey">Auto Key Vigenere Cipher</button>
+      <button class="option" @click="onClickOptionExtended">Extended Vigenere Cipher</button>
+    </div>
     <div class="keystring-container">
       <p>Cipher Key:</p>
       <input
@@ -15,19 +22,40 @@
 <script>
 import {
   VigenereCipherEncrypt,
-  VigenereCipherDecrypt
+  VigenereCipherDecrypt,
+  FullVigenereCipherEncrypt,
+  FullVigenereCipherDecrypt
 } from "@/utils/vigenere_cipher";
 
 import { mapGetters, mapMutations } from "vuex";
+import { removeWhiteSpace } from "@/utils/preprocessor";
 
 export default {
   name: "VigenereCipher",
   data() {
     return {
-      keystring: ""
+      keystring: "",
+      variantStr: "Standard",
+      variantInt: null,
     };
   },
   methods: {
+    onClickOptionStandard() {
+      this.variantStr = "Standard"
+      this.variantInt = 1;
+    },
+    onClickOptionFull() {
+      this.variantStr = "Full"
+      this.variantInt = 2;
+    },
+    onClickOptionAutoKey() {
+      this.variantStr = "Auto Key"
+      this.variantInt = 3;
+    },
+    onClickOptionExtended() {
+      this.variantStr = "Extended"
+      this.variantInt = 4;
+    },
     ...mapMutations(["setPlaintext", "setCiphertext", "endProcessing"]),
     ...mapGetters(["getPlaintext", "getCiphertext"])
   },
@@ -38,13 +66,35 @@ export default {
     isProcessing(newVal) {
       if (newVal) {
         if (this.isEncrypt) {
-          this.setCiphertext(
-            VigenereCipherEncrypt(this.getPlaintext(), this.keystring.replace(/\s/g, ''))
-          );
+          switch (this.variantInt) {
+            case 1:
+              this.setCiphertext(
+                VigenereCipherEncrypt(this.getPlaintext(), removeWhiteSpace(this.keystring))
+              );   
+              break;
+            case 2:
+              this.setCiphertext(
+                FullVigenereCipherEncrypt(this.getPlaintext(), removeWhiteSpace(this.keystring))
+              );
+              break;
+            default:
+              break;
+          }
         } else {
-          this.setPlaintext(
-            VigenereCipherDecrypt(this.getCiphertext(), this.keystring.replace(/\s/g, ''))
-          );
+          switch (this.variantInt) {
+            case 1:
+              this.setPlaintext(
+                VigenereCipherDecrypt(this.getCiphertext(), removeWhiteSpace(this.keystring))
+              );
+              break;
+            case 2:
+              this.setPlaintext(
+                FullVigenereCipherDecrypt(this.getCiphertext(), removeWhiteSpace(this.keystring))
+              );
+              break;
+            default:
+              break;
+          }
         }
 
         this.endProcessing();
@@ -57,6 +107,20 @@ export default {
 <style lang="scss" scoped>
 .vigenere-cipher {
   width: 100%;
+
+  .option-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+
+    .option {
+      margin-right: 15px;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
 
   .keystring-container {
     display: flex;

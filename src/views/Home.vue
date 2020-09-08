@@ -22,6 +22,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import { removeWhiteSpace } from '@/utils/preprocessor';
 
 export default {
   name: "Home",
@@ -32,12 +33,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['isProcessing'])
+    ...mapGetters(['isProcessing', 'isEncrypt'])
   },
   methods: {
     setPlainAndCipherText() {
-      this.$store.commit("setPlaintext", this.plaintext);
-      this.$store.commit("setCiphertext", this.ciphertext);
+      this.$store.commit("setPlaintext", removeWhiteSpace(this.plaintext));
+      this.$store.commit("setCiphertext", removeWhiteSpace(this.ciphertext));
     },
     onClickEncrypt() {
       this.ciphertext = "";
@@ -56,8 +57,8 @@ export default {
   watch: {
     isProcessing(newVal) {
       if (!newVal) {
-        this.plaintext = this.getPlaintext();
-        this.ciphertext = this.getCiphertext();
+        if (this.isEncrypt) this.ciphertext = this.getCiphertext();
+        else this.plaintext = this.getPlaintext();  
       }
     }
   }
