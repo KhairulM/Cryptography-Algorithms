@@ -25,6 +25,8 @@ import {
   VigenereCipherDecrypt,
   FullVigenereCipherEncrypt,
   FullVigenereCipherDecrypt,
+  ExtendedVigenereCipherEncrypt,
+  ExtendedVigenereCipherDecrypt,
 } from "@/utils/vigenere_cipher";
 
 import { mapGetters, mapMutations } from "vuex";
@@ -69,26 +71,32 @@ export default {
           switch (this.variantInt) {
             case 1:
               this.setCiphertext(
-                VigenereCipherEncrypt(this.getPlaintext(), removeWhiteSpace(this.keystring))
+                VigenereCipherEncrypt(removeWhiteSpace(this.getPlaintext()), removeWhiteSpace(this.keystring))
               );   
               break;
             case 2:
               this.setCiphertext(
-                FullVigenereCipherEncrypt(this.getPlaintext(), removeWhiteSpace(this.keystring))
+                FullVigenereCipherEncrypt(removeWhiteSpace(this.getPlaintext()), removeWhiteSpace(this.keystring))
               );
               break;
             case 3:
               {
                 let plaintext = this.getPlaintext();
                 plaintext = removeWhiteSpace(plaintext);
+                this.keystring = removeWhiteSpace(this.keystring);
                 if (this.keystring.length < plaintext.length) {
                   this.keystring += plaintext.slice(0, plaintext.length - this.keystring.length);
                 }
 
                 this.setCiphertext(
-                  VigenereCipherEncrypt(this.getPlaintext(), removeWhiteSpace(this.keystring))
+                  VigenereCipherEncrypt(removeWhiteSpace(this.getPlaintext()), this.keystring)
                 );
               }
+              break;
+            case 4:
+              this.setCiphertext(
+                ExtendedVigenereCipherEncrypt(this.getPlaintext(), this.keystring)
+              );
               break;
             default:
               break;
@@ -97,17 +105,22 @@ export default {
           switch (this.variantInt) {
             case 1:
               this.setPlaintext(
-                VigenereCipherDecrypt(this.getCiphertext(), removeWhiteSpace(this.keystring))
+                VigenereCipherDecrypt(removeWhiteSpace(this.getCiphertext()), removeWhiteSpace(this.keystring))
               );
               break;
             case 2:
               this.setPlaintext(
-                FullVigenereCipherDecrypt(this.getCiphertext(), removeWhiteSpace(this.keystring))
+                FullVigenereCipherDecrypt(removeWhiteSpace(this.getCiphertext()), removeWhiteSpace(this.keystring))
               );
               break;
             case 3:
               this.setPlaintext(
-                VigenereCipherDecrypt(this.getCiphertext(), removeWhiteSpace(this.keystring))
+                VigenereCipherDecrypt(removeWhiteSpace(this.getCiphertext()), removeWhiteSpace(this.keystring))
+              );
+              break;
+            case 4:
+              this.setPlaintext(
+                ExtendedVigenereCipherDecrypt(this.getCiphertext(), this.keystring)
               );
               break;
             default:

@@ -22,7 +22,6 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import { removeWhiteSpace } from '@/utils/preprocessor';
 
 export default {
   name: "Home",
@@ -37,8 +36,8 @@ export default {
   },
   methods: {
     setPlainAndCipherText() {
-      this.$store.commit("setPlaintext", removeWhiteSpace(this.plaintext));
-      this.$store.commit("setCiphertext", removeWhiteSpace(this.ciphertext));
+      this.$store.commit("setPlaintext", this.plaintext);
+      this.$store.commit("setCiphertext", this.ciphertext);
     },
     onClickEncrypt() {
       this.ciphertext = "";

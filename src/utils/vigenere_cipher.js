@@ -1,3 +1,8 @@
+import { 
+  filterAlphabets,
+  filterASCII,
+} from "../utils/preprocessor";
+
 let seedrandom = require('seedrandom');
 let count = 0; // for full vigenere cipher
 
@@ -5,7 +10,9 @@ export function VigenereCipherEncrypt(plaintext, keystring) {
   // sanity check
   plaintext = plaintext.toLowerCase();
   keystring = keystring.toLowerCase();
-
+  plaintext = filterAlphabets(plaintext);
+  keystring = filterAlphabets(keystring);
+  
   // check if key length is equal to plaintext length
   if (keystring.length < plaintext.length) {
     for (let i = 0; i < plaintext.length; i++) {
@@ -29,10 +36,11 @@ export function VigenereCipherEncrypt(plaintext, keystring) {
 }
 
 export function VigenereCipherDecrypt(ciphertext, keystring) {
-  console.log(ciphertext, keystring);
   // sanity check
   ciphertext = ciphertext.toLowerCase();
   keystring = keystring.toLowerCase();
+  ciphertext = filterAlphabets(ciphertext);
+  keystring = filterAlphabets(keystring);
 
   // check if key length is equal to ciphertext length
   if (keystring.length < ciphertext.length) {
@@ -66,6 +74,8 @@ export function FullVigenereCipherEncrypt(plaintext, keystring) {
   // sanity check
   plaintext = plaintext.toLowerCase();
   keystring = keystring.toLowerCase();
+  plaintext = filterAlphabets(plaintext);
+  keystring = filterAlphabets(keystring);
 
   // check if key length is equal to plaintext length
   if (keystring.length < plaintext.length) {
@@ -113,6 +123,8 @@ export function FullVigenereCipherDecrypt(ciphertext, keystring) {
   // sanity check
   ciphertext = ciphertext.toLowerCase();
   keystring = keystring.toLowerCase();
+  ciphertext = filterAlphabets(ciphertext);
+  keystring = filterAlphabets(keystring);
 
   // check if key length is equal to ciphertext length
   if (keystring.length < ciphertext.length) {
@@ -150,6 +162,63 @@ export function FullVigenereCipherDecrypt(ciphertext, keystring) {
 
     // find the index of cipherChar inside mapValue
     let plainCharCode = mapValue.indexOf(cipherChar) + 97;
+    plaintext += String.fromCharCode(plainCharCode);
+  }
+
+  return plaintext.toLowerCase();
+}
+
+export function ExtendedVigenereCipherEncrypt(plaintext, keystring) {
+  // sanity check
+  plaintext = filterASCII(plaintext);
+  keystring = filterASCII(keystring);
+
+  // check if key length is equal to plaintext length
+  if (keystring.length < plaintext.length) {
+    for (let i = 0; i < plaintext.length; i++) {
+      keystring += keystring[i];
+    }
+  } else if (keystring.length > plaintext.length) {
+    keystring = keystring.slice(0, plaintext.length);
+  }
+
+  let ciphertext = "";
+
+  for (let i = 0; i < plaintext.length; i++) {
+    let cipherCharCode =
+      (plaintext.charCodeAt(i) + keystring.charCodeAt(i)) % 256;
+
+    ciphertext += String.fromCharCode(cipherCharCode);
+  }
+
+  return ciphertext.toUpperCase();
+}
+
+export function ExtendedVigenereCipherDecrypt(ciphertext, keystring) {
+  // sanity check
+  ciphertext = filterASCII(ciphertext);
+  keystring = filterASCII(keystring);
+
+  // check if key length is equal to ciphertext length
+  if (keystring.length < ciphertext.length) {
+    for (let i = 0; i < ciphertext.length; i++) {
+      keystring += keystring[i];
+    }
+  } else if (keystring.length > ciphertext.length) {
+    keystring = keystring.slice(0, ciphertext.length);
+  }
+
+  let plaintext = "";
+
+  for (let i = 0; i < ciphertext.length; i++) {
+    let plainCharCode = ciphertext.charCodeAt(i) - keystring.charCodeAt(i);
+    if (plainCharCode < 0) {
+      plainCharCode = Math.abs(plainCharCode) % 256;
+      plainCharCode = 256 - plainCharCode;
+    } else {
+      plainCharCode = plainCharCode % 256;
+    }
+
     plaintext += String.fromCharCode(plainCharCode);
   }
 
