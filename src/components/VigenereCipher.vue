@@ -24,7 +24,7 @@ import {
   VigenereCipherEncrypt,
   VigenereCipherDecrypt,
   FullVigenereCipherEncrypt,
-  FullVigenereCipherDecrypt
+  FullVigenereCipherDecrypt,
 } from "@/utils/vigenere_cipher";
 
 import { mapGetters, mapMutations } from "vuex";
@@ -36,7 +36,7 @@ export default {
     return {
       keystring: "",
       variantStr: "Standard",
-      variantInt: null,
+      variantInt: 1,
     };
   },
   methods: {
@@ -77,6 +77,19 @@ export default {
                 FullVigenereCipherEncrypt(this.getPlaintext(), removeWhiteSpace(this.keystring))
               );
               break;
+            case 3:
+              {
+                let plaintext = this.getPlaintext();
+                plaintext = removeWhiteSpace(plaintext);
+                if (this.keystring.length < plaintext.length) {
+                  this.keystring += plaintext.slice(0, plaintext.length - this.keystring.length);
+                }
+
+                this.setCiphertext(
+                  VigenereCipherEncrypt(this.getPlaintext(), removeWhiteSpace(this.keystring))
+                );
+              }
+              break;
             default:
               break;
           }
@@ -90,6 +103,11 @@ export default {
             case 2:
               this.setPlaintext(
                 FullVigenereCipherDecrypt(this.getCiphertext(), removeWhiteSpace(this.keystring))
+              );
+              break;
+            case 3:
+              this.setPlaintext(
+                VigenereCipherDecrypt(this.getCiphertext(), removeWhiteSpace(this.keystring))
               );
               break;
             default:

@@ -29,6 +29,7 @@ export function VigenereCipherEncrypt(plaintext, keystring) {
 }
 
 export function VigenereCipherDecrypt(ciphertext, keystring) {
+  console.log(ciphertext, keystring);
   // sanity check
   ciphertext = ciphertext.toLowerCase();
   keystring = keystring.toLowerCase();
