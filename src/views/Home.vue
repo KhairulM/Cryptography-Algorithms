@@ -5,6 +5,7 @@
       <router-link to="/playfair-cipher">Playfair Cipher</router-link>
       <router-link to="/affine-cipher">Affine Cipher</router-link>
       <router-link to="/hill-cipher">Hill Cipher</router-link>
+      <router-link to="/super-encryption">Super Encryption</router-link>
     </div>
     <router-view></router-view>
     <div class="input-container">
@@ -67,7 +68,7 @@ export default {
 <style lang="scss" scoped>
 .home {
   margin-top: 20px;
-  width: 36em;
+  width: 40em;
 
   .link-container {
     display: flex;
