@@ -7,7 +7,19 @@ export function PlayfairCipherEncrypt(plainText, key) {
     for (let i = 0; i < cleanText.length; i += 2) {
         cipher += EncryptPair(cleanText[i] + cleanText[i + 1], matrix);
     }
-    return cipher
+    return cipher;
+}
+
+export function PlayfairCipherDecrypt(cipher, key) {
+    let cleanCipher = CleanText(cipher);
+    let clearKey = ClearDuplicates(key);
+    let matrix = BuildMatrix(clearKey);
+    if (cleanCipher.length % 2 !== 0) cleanCipher += 'Z';
+    let plainText = '';
+    for (let i = 0; i < cleanCipher.length; i += 2) {
+        plainText += DecryptPair(cleanCipher[i] + cleanCipher[i + 1], matrix);
+    }
+    return plainText;
 }
 
 function CleanText(text) {
@@ -60,6 +72,37 @@ function EncryptPair(pair, matrix) {
         case 2:
             encrypted += matrix[(firstID + 5) % 25];
             encrypted += matrix[(secondID + 5) % 25];
+            break;
+    }
+    return encrypted;
+}
+
+function DecryptPair(pair, matrix) {
+    let firstID = matrix.indexOf(pair[0]);
+    let secondID = matrix.indexOf(pair[1]);
+    let encrypted = '';
+    let pairType = GetPairType(firstID, secondID);
+    switch (pairType) {
+        case 0:
+            let firstCol = firstID % 5;
+            let secondCol = secondID % 5;
+            let delta = Math.abs(firstCol - secondCol);
+            if (firstCol < secondCol) {
+                encrypted += matrix[firstID + delta];
+                encrypted += matrix[secondID - delta];
+            } else {
+                encrypted += matrix[firstID - delta];
+                encrypted += matrix[secondID + delta];
+            }
+            break;
+        case 1:
+            let row = Math.floor(firstID / 5);
+            encrypted += matrix[(row * 5) + ((firstID + 4) % 5)];
+            encrypted += matrix[(row * 5) + ((secondID + 4) % 5)];
+            break;
+        case 2:
+            encrypted += matrix[(firstID + 20) % 25];
+            encrypted += matrix[(secondID + 20) % 25];
             break;
     }
     return encrypted;
