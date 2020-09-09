@@ -3,14 +3,18 @@ import Vuex from "vuex";
 
 Vue.use(Vuex);
 
-const store = new Vuex.Store({
-  state: {
+const getDefaultState = () => {
+  return {
     plaintext: "",
     ciphertext: "",
     encrypt: null,
     fromFile: false,
     processing: false
-  },
+  }
+}
+
+const store = new Vuex.Store({
+  state: getDefaultState(),
   getters: {
     getPlaintext: state => state.plaintext,
     getCiphertext: state => state.ciphertext,
@@ -19,6 +23,9 @@ const store = new Vuex.Store({
     isFromFile: state => state.fromFile
   },
   mutations: {
+    resetStore(state) {
+      Object.assign(state, getDefaultState());
+    },
     setPlaintext(state, plaintext) {
       state.plaintext = plaintext;
     },

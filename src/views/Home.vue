@@ -91,7 +91,7 @@ export default {
       }
     },
     ...mapGetters(["getPlaintext", "getCiphertext"]),
-    ...mapMutations(["setPlaintext", "setCiphertext", "startProcessing"])
+    ...mapMutations(["setPlaintext", "setCiphertext", "startProcessing", "resetStore"])
   },
   watch: {
     isProcessing(newVal) {
@@ -108,6 +108,9 @@ export default {
           saveFile(tobeDownloadStr, fileName);
         }
       }
+    },
+    $route() {
+      this.resetStore();
     }
   },
   created() {
