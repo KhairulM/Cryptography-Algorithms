@@ -36,7 +36,7 @@ import {
 } from "@/utils/vigenere_cipher";
 
 import { mapGetters, mapMutations } from "vuex";
-import { filterAlphabets, filterASCII } from "@/utils/preprocessor";
+import { filterAlphabets } from "@/utils/preprocessor";
 
 export default {
   name: "VigenereCipher",
@@ -96,10 +96,6 @@ export default {
 
           ciphertext = ciphertext.toLowerCase();
           ciphertext = filterAlphabets(ciphertext);
-        } else {
-          keystring = filterASCII(keystring);
-          plaintext = filterASCII(plaintext);
-          ciphertext = filterASCII(ciphertext);
         }
 
         if (this.isEncrypt) {

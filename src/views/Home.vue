@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapMutations } from "vuex";
 
 export default {
   name: "Home",
@@ -51,19 +51,26 @@ export default {
     ...mapGetters(["isProcessing", "isEncrypt", "isFromFile"])
   },
   methods: {
+    setFileResult(result) {
+      if (this.isEncrypt) {
+        this.setPlaintext(result);
+      } else {
+        this.setCiphertext(result);
+      }
+    },
     setPlainAndCipherText() {
-      this.$store.commit("setPlaintext", this.plaintext);
-      this.$store.commit("setCiphertext", this.ciphertext);
+      this.setPlaintext(this.plaintext);
+      this.setCiphertext(this.ciphertext);
     },
     onClickEncrypt() {
       this.$store.commit("setEncrypt", true);
 
       if (this.isFromFile) {
         let file = this.$refs.fileInputHandler.files[0];
-        this.fileReader.readAsText(file);
+        this.fileReader.readAsBinaryString(file);
       } else {
         this.setPlainAndCipherText();
-        this.$store.commit("startProcessing");
+        this.startProcessing();
       }
     },
     onClickDecrypt() {
@@ -71,13 +78,14 @@ export default {
 
       if (this.isFromFile) {
         let file = this.$refs.fileInputHandler.files[0];
-        this.fileReader.readAsText(file);
+        this.fileReader.readAsBinaryString(file);
       } else {
         this.setPlainAndCipherText();
-        this.$store.commit("startProcessing");
+        this.startProcessing();
       }
     },
-    ...mapGetters(["getPlaintext", "getCiphertext"])
+    ...mapGetters(["getPlaintext", "getCiphertext"]),
+    ...mapMutations(["setPlaintext", "setCiphertext", "startProcessing"])
   },
   watch: {
     isProcessing(newVal) {
@@ -95,10 +103,14 @@ export default {
             var a = document.createElement("a");
             document.body.appendChild(a);
             a.style = "display: none";
-            return function(data, name) {
-              let blob = new Blob(data, {
-                type: "text/plain",
-                endings: "native"
+            return function(binaryString, name) {
+              let array = new Uint8Array(binaryString.length);
+              for (let i = 0; i < binaryString.length; i++) {
+                array[i] = binaryString.charCodeAt(i);
+              }
+
+              let blob = new Blob([array], {
+                type: "application/octet-stream"
               });
               let url = window.URL.createObjectURL(blob);
               a.href = url;
@@ -108,7 +120,7 @@ export default {
             };
           })();
 
-          saveFile([tobeDownloadStr], fileName);
+          saveFile(tobeDownloadStr, fileName);
         }
       }
     }
@@ -124,12 +136,8 @@ export default {
       function(e) {
         // contents of file in variable
         let result = e.target.result;
-        if (this.isEncrypt) {
-          this.$store.commit("setPlaintext", result);
-        } else {
-          this.$store.commit("setCiphertext", result);
-        }
-        this.$store.commit("startProcessing");
+        this.setFileResult(result);
+        this.startProcessing();
       }.bind(this)
     );
 

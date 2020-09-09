@@ -169,7 +169,7 @@ export function ExtendedVigenereCipherEncrypt(plaintext, keystring) {
     ciphertext += String.fromCharCode(cipherCharCode);
   }
 
-  return ciphertext.toUpperCase();
+  return ciphertext;
 }
 
 export function ExtendedVigenereCipherDecrypt(ciphertext, keystring) {
@@ -196,5 +196,5 @@ export function ExtendedVigenereCipherDecrypt(ciphertext, keystring) {
     plaintext += String.fromCharCode(plainCharCode);
   }
 
-  return plaintext.toLowerCase();
+  return plaintext;
 }
