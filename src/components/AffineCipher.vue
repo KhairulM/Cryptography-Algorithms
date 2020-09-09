@@ -39,6 +39,9 @@ export default {
     isProcessing(newVal) {
       if (newVal) {
         // check if m is co-prime with 26
+        this.mKey = parseInt(this.mKey);
+        this.nKey = parseInt(this.nKey);
+
         let gcd = (a, b) => {
           if (!b) return a;
           return gcd(b, a % b);
