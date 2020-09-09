@@ -23,6 +23,7 @@
       <p>Ciphertext:</p>
       <textarea
         id="ciphertext"
+        ref="ciphertext"
         v-model="ciphertext"
         cols="30"
         rows="10"
@@ -30,6 +31,7 @@
     </div>
     <div class="action-container">
       <button class="button-encrypt" @click="onClickEncrypt">Encrypt</button>
+      <button v-if="!isFromFile" class="button-download" @click="downloadCiphertext">Download Ciphertext</button>
       <button class="button-decrypt" @click="onClickDecrypt">Decrypt</button>
     </div>
   </div>
@@ -37,6 +39,7 @@
 
 <script>
 import { mapGetters, mapMutations } from "vuex";
+import { saveFile } from "@/utils/file_op";
 
 export default {
   name: "Home",
@@ -51,6 +54,9 @@ export default {
     ...mapGetters(["isProcessing", "isEncrypt", "isFromFile"])
   },
   methods: {
+    downloadCiphertext() {
+      saveFile(this.getCiphertext(), 'ciphertext.txt');
+    },
     setFileResult(result) {
       if (this.isEncrypt) {
         this.setPlaintext(result);
@@ -98,27 +104,6 @@ export default {
             ? this.getCiphertext()
             : this.getPlaintext();
           let fileName = this.isEncrypt ? "Encrypted" : "Decrypted";
-
-          let saveFile = (function() {
-            var a = document.createElement("a");
-            document.body.appendChild(a);
-            a.style = "display: none";
-            return function(binaryString, name) {
-              let array = new Uint8Array(binaryString.length);
-              for (let i = 0; i < binaryString.length; i++) {
-                array[i] = binaryString.charCodeAt(i);
-              }
-
-              let blob = new Blob([array], {
-                type: "application/octet-stream"
-              });
-              let url = window.URL.createObjectURL(blob);
-              a.href = url;
-              a.download = name;
-              a.click();
-              window.URL.revokeObjectURL(url);
-            };
-          })();
 
           saveFile(tobeDownloadStr, fileName);
         }
