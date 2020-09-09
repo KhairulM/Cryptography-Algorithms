@@ -15,7 +15,7 @@
 
 <script>
 import { mapGetters, mapMutations } from "vuex";
-import { removeWhiteSpace } from "@/utils/preprocessor";
+import { filterAlphabets } from "@/utils/preprocessor";
 import {
   PlayfairCipherEncrypt,
   PlayfairCipherDecrypt
@@ -25,11 +25,11 @@ export default {
   name: "PlayfairCipher",
   data() {
     return {
-      keystring: "",
-    }
+      keystring: ""
+    };
   },
   computed: {
-    ...mapGetters(['isProcessing', 'isEncrypt'])
+    ...mapGetters(["isProcessing", "isEncrypt"])
   },
   methods: {
     ...mapMutations(["setPlaintext", "setCiphertext", "endProcessing"]),
@@ -38,13 +38,23 @@ export default {
   watch: {
     isProcessing(newVal) {
       if (newVal) {
+        let keystring = filterAlphabets(this.keystring);
+
         if (this.isEncrypt) {
-          this.setCiphertext(PlayfairCipherEncrypt(this.getPlaintext(), removeWhiteSpace(this.keystring)));
+          let plaintext = this.getPlaintext();
+          plaintext = plaintext.toLowerCase();
+          plaintext = filterAlphabets(plaintext);
+
+          this.setCiphertext(PlayfairCipherEncrypt(plaintext, keystring));
         } else {
-          this.setPlaintext(PlayfairCipherDecrypt(this.getCiphertext(), removeWhiteSpace(this.keystring)));
+          let ciphertext = this.getCiphertext();
+          ciphertext = ciphertext.toLowerCase();
+          ciphertext = filterAlphabets(ciphertext);
+
+          this.setPlaintext(PlayfairCipherDecrypt(ciphertext, keystring));
         }
 
-        this.endProcessing()
+        this.endProcessing();
       }
     }
   }

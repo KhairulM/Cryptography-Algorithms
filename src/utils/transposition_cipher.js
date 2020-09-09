@@ -10,7 +10,7 @@ export function TranspositionCipherEncrypt(plaintext) {
   let ciphertext = "";
 
   for (let i = 0; i < plaintext.length; i += numCol) {
-    ciphertext += plaintext[i]
+    ciphertext += plaintext[i];
   }
 
   for (let i = 1; i < plaintext.length; i += numCol) {
@@ -26,13 +26,13 @@ export function TranspositionCipherDecrypt(ciphertext) {
   ciphertext = filterAlphabets(ciphertext);
 
   const numCol = 2;
-  const numRow = Math.ceil(ciphertext.length/numCol);
+  const numRow = Math.ceil(ciphertext.length / numCol);
 
   let plaintext = "";
 
   for (let i = 0; i < numRow; i++) {
     plaintext += ciphertext[i];
-    if (i + numRow < ciphertext.length) plaintext += ciphertext[i + numRow]
+    if (i + numRow < ciphertext.length) plaintext += ciphertext[i + numRow];
   }
 
   return plaintext.toLowerCase();

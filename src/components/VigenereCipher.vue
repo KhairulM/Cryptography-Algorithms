@@ -3,9 +3,15 @@
     <h3>{{ `${variantStr} Vigenere Cipher` }}</h3>
     <div class="option-container">
       <button class="option" @click="onClickOptionStandard">Standard</button>
-      <button class="option" @click="onClickOptionFull">Full Vigenere Cipher</button>
-      <button class="option" @click="onClickOptionAutoKey">Auto Key Vigenere Cipher</button>
-      <button class="option" @click="onClickOptionExtended">Extended Vigenere Cipher</button>
+      <button class="option" @click="onClickOptionFull">
+        Full Vigenere Cipher
+      </button>
+      <button class="option" @click="onClickOptionAutoKey">
+        Auto Key Vigenere Cipher
+      </button>
+      <button class="option" @click="onClickOptionExtended">
+        Extended Vigenere Cipher
+      </button>
     </div>
     <div class="keystring-container">
       <p>Cipher Key:</p>
@@ -26,11 +32,11 @@ import {
   FullVigenereCipherEncrypt,
   FullVigenereCipherDecrypt,
   ExtendedVigenereCipherEncrypt,
-  ExtendedVigenereCipherDecrypt,
+  ExtendedVigenereCipherDecrypt
 } from "@/utils/vigenere_cipher";
 
 import { mapGetters, mapMutations } from "vuex";
-import { removeWhiteSpace } from "@/utils/preprocessor";
+import { filterAlphabets, filterASCII } from "@/utils/preprocessor";
 
 export default {
   name: "VigenereCipher",
@@ -38,27 +44,36 @@ export default {
     return {
       keystring: "",
       variantStr: "Standard",
-      variantInt: 1,
+      variantInt: 1
     };
   },
   methods: {
     onClickOptionStandard() {
-      this.variantStr = "Standard"
+      this.variantStr = "Standard";
       this.variantInt = 1;
+      this.setFromFile(false);
     },
     onClickOptionFull() {
-      this.variantStr = "Full"
+      this.variantStr = "Full";
       this.variantInt = 2;
+      this.setFromFile(false);
     },
     onClickOptionAutoKey() {
-      this.variantStr = "Auto Key"
+      this.variantStr = "Auto Key";
       this.variantInt = 3;
+      this.setFromFile(false);
     },
     onClickOptionExtended() {
-      this.variantStr = "Extended"
+      this.variantStr = "Extended";
       this.variantInt = 4;
+      this.setFromFile(true);
     },
-    ...mapMutations(["setPlaintext", "setCiphertext", "endProcessing"]),
+    ...mapMutations([
+      "setPlaintext",
+      "setCiphertext",
+      "endProcessing",
+      "setFromFile"
+    ]),
     ...mapGetters(["getPlaintext", "getCiphertext"])
   },
   computed: {
@@ -67,35 +82,52 @@ export default {
   watch: {
     isProcessing(newVal) {
       if (newVal) {
+        // preprocessing
+        let keystring = this.keystring;
+        let plaintext = this.getPlaintext();
+        let ciphertext = this.getCiphertext();
+
+        if (this.variantInt != 4) {
+          keystring = keystring.toLowerCase();
+          keystring = filterAlphabets(keystring);
+
+          plaintext = plaintext.toLowerCase();
+          plaintext = filterAlphabets(plaintext);
+
+          ciphertext = ciphertext.toLowerCase();
+          ciphertext = filterAlphabets(ciphertext);
+        } else {
+          keystring = filterASCII(keystring);
+          plaintext = filterASCII(plaintext);
+          ciphertext = filterASCII(ciphertext);
+        }
+
         if (this.isEncrypt) {
           switch (this.variantInt) {
             case 1:
-              this.setCiphertext(
-                VigenereCipherEncrypt(removeWhiteSpace(this.getPlaintext()), removeWhiteSpace(this.keystring))
-              );   
+              this.setCiphertext(VigenereCipherEncrypt(plaintext, keystring));
               break;
             case 2:
               this.setCiphertext(
-                FullVigenereCipherEncrypt(removeWhiteSpace(this.getPlaintext()), removeWhiteSpace(this.keystring))
+                FullVigenereCipherEncrypt(plaintext, keystring)
               );
               break;
             case 3:
               {
-                let plaintext = this.getPlaintext();
-                plaintext = removeWhiteSpace(plaintext);
-                this.keystring = removeWhiteSpace(this.keystring);
-                if (this.keystring.length < plaintext.length) {
-                  this.keystring += plaintext.slice(0, plaintext.length - this.keystring.length);
+                if (keystring.length < plaintext.length) {
+                  keystring += plaintext.slice(
+                    0,
+                    plaintext.length - this.keystring.length
+                  );
+                  this.keystring = keystring;
                 }
 
-                this.setCiphertext(
-                  VigenereCipherEncrypt(removeWhiteSpace(this.getPlaintext()), this.keystring)
-                );
+                this.setCiphertext(VigenereCipherEncrypt(plaintext, keystring));
               }
               break;
             case 4:
               this.setCiphertext(
-                ExtendedVigenereCipherEncrypt(this.getPlaintext(), this.keystring)
+                ExtendedVigenereCipherEncrypt(plaintext, keystring)
               );
               break;
             default:
@@ -104,23 +136,19 @@ export default {
         } else {
           switch (this.variantInt) {
             case 1:
-              this.setPlaintext(
-                VigenereCipherDecrypt(removeWhiteSpace(this.getCiphertext()), removeWhiteSpace(this.keystring))
-              );
+              this.setPlaintext(VigenereCipherDecrypt(ciphertext, keystring));
               break;
             case 2:
               this.setPlaintext(
-                FullVigenereCipherDecrypt(removeWhiteSpace(this.getCiphertext()), removeWhiteSpace(this.keystring))
+                FullVigenereCipherDecrypt(ciphertext, keystring)
               );
               break;
             case 3:
-              this.setPlaintext(
-                VigenereCipherDecrypt(removeWhiteSpace(this.getCiphertext()), removeWhiteSpace(this.keystring))
-              );
+              this.setPlaintext(VigenereCipherDecrypt(ciphertext, keystring));
               break;
             case 4:
               this.setPlaintext(
-                ExtendedVigenereCipherDecrypt(this.getCiphertext(), this.keystring)
+                ExtendedVigenereCipherDecrypt(ciphertext, keystring)
               );
               break;
             default:

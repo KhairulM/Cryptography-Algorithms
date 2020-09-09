@@ -8,11 +8,25 @@
       <router-link to="/super-encryption">Super Encryption</router-link>
     </div>
     <router-view></router-view>
-    <div class="input-container">
+    <div v-if="isFromFile" class="file-input-container">
+      <p>Select a file:</p>
+      <input type="file" ref="fileInputHandler" />
+    </div>
+    <div v-else class="input-container">
       <p>Plaintext:</p>
-      <textarea id="plaintext" v-model="plaintext" cols="30" rows="10"></textarea>
+      <textarea
+        id="plaintext"
+        v-model="plaintext"
+        cols="30"
+        rows="10"
+      ></textarea>
       <p>Ciphertext:</p>
-      <textarea id="ciphertext" v-model="ciphertext" cols="30" rows="10"></textarea>
+      <textarea
+        id="ciphertext"
+        v-model="ciphertext"
+        cols="30"
+        rows="10"
+      ></textarea>
     </div>
     <div class="action-container">
       <button class="button-encrypt" @click="onClickEncrypt">Encrypt</button>
@@ -22,7 +36,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters } from "vuex";
 
 export default {
   name: "Home",
@@ -30,10 +44,11 @@ export default {
     return {
       plaintext: "",
       ciphertext: "",
-    }
+      fileReader: null
+    };
   },
   computed: {
-    ...mapGetters(['isProcessing', 'isEncrypt'])
+    ...mapGetters(["isProcessing", "isEncrypt", "isFromFile"])
   },
   methods: {
     setPlainAndCipherText() {
@@ -41,26 +56,86 @@ export default {
       this.$store.commit("setCiphertext", this.ciphertext);
     },
     onClickEncrypt() {
-      this.ciphertext = "";
-      this.setPlainAndCipherText();
       this.$store.commit("setEncrypt", true);
-      this.$store.commit("startProcessing");
+
+      if (this.isFromFile) {
+        let file = this.$refs.fileInputHandler.files[0];
+        this.fileReader.readAsText(file);
+      } else {
+        this.setPlainAndCipherText();
+        this.$store.commit("startProcessing");
+      }
     },
     onClickDecrypt() {
-      this.plaintext = "";
-      this.setPlainAndCipherText();
       this.$store.commit("setEncrypt", false);
-      this.$store.commit("startProcessing");
+
+      if (this.isFromFile) {
+        let file = this.$refs.fileInputHandler.files[0];
+        this.fileReader.readAsText(file);
+      } else {
+        this.setPlainAndCipherText();
+        this.$store.commit("startProcessing");
+      }
     },
-    ...mapGetters(['getPlaintext', 'getCiphertext'])
+    ...mapGetters(["getPlaintext", "getCiphertext"])
   },
   watch: {
     isProcessing(newVal) {
       if (!newVal) {
         if (this.isEncrypt) this.ciphertext = this.getCiphertext();
-        else this.plaintext = this.getPlaintext();  
+        else this.plaintext = this.getPlaintext();
+
+        if (this.isFromFile) {
+          let tobeDownloadStr = this.isEncrypt
+            ? this.getCiphertext()
+            : this.getPlaintext();
+          let fileName = this.isEncrypt ? "Encrypted" : "Decrypted";
+
+          let saveFile = (function() {
+            var a = document.createElement("a");
+            document.body.appendChild(a);
+            a.style = "display: none";
+            return function(data, name) {
+              let blob = new Blob(data, {
+                type: "text/plain",
+                endings: "native"
+              });
+              let url = window.URL.createObjectURL(blob);
+              a.href = url;
+              a.download = name;
+              a.click();
+              window.URL.revokeObjectURL(url);
+            };
+          })();
+
+          saveFile([tobeDownloadStr], fileName);
+        }
       }
     }
+  },
+  created() {
+    this.fileReader = new FileReader();
+    this.fileReader.addEventListener("loadstart", function() {
+      console.log("File reading started");
+    });
+
+    this.fileReader.addEventListener(
+      "loadend",
+      function(e) {
+        // contents of file in variable
+        let result = e.target.result;
+        if (this.isEncrypt) {
+          this.$store.commit("setPlaintext", result);
+        } else {
+          this.$store.commit("setCiphertext", result);
+        }
+        this.$store.commit("startProcessing");
+      }.bind(this)
+    );
+
+    this.fileReader.addEventListener("error", function() {
+      alert("Error : Failed to read file");
+    });
   }
 };
 </script>
@@ -81,6 +156,22 @@ export default {
       background-color: grey;
       padding: 10px;
       border-radius: 5px;
+    }
+  }
+
+  .file-input-container {
+    margin-top: 10px;
+    padding: 20px;
+    width: calc(100%-40px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 3px;
+    border: 1px solid #e3e3e3;
+
+    input {
+      margin-top: 10px;
     }
   }
 

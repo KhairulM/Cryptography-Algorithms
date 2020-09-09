@@ -1,7 +1,10 @@
 <template>
   <div class="super-encryption">
     <h3>Super Encryption</h3>
-    <p>Algoritma yang digunakan adalah <i>Standard Vigenere Cipher</i> + Cipher Transposisi matriks dengan <i>n = 2</i></p>
+    <p>
+      Algoritma yang digunakan adalah <i>Standard Vigenere Cipher</i> + Cipher
+      Transposisi matriks dengan <i>n = 2</i>
+    </p>
     <div class="keystring-container">
       <p>Vigenere Cipher Key:</p>
       <input
@@ -16,25 +19,25 @@
 
 <script>
 import { mapGetters, mapMutations } from "vuex";
-import { 
+import {
   VigenereCipherEncrypt,
   VigenereCipherDecrypt
 } from "@/utils/vigenere_cipher";
-import { 
+import {
   TranspositionCipherEncrypt,
   TranspositionCipherDecrypt
 } from "@/utils/transposition_cipher";
-import { removeWhiteSpace } from "@/utils/preprocessor";
+import { filterAlphabets } from "@/utils/preprocessor";
 
 export default {
   name: "SuperEncryption",
   data() {
     return {
-      keystring: "",
-    }
+      keystring: ""
+    };
   },
   computed: {
-    ...mapGetters(['isProcessing', 'isEncrypt'])
+    ...mapGetters(["isProcessing", "isEncrypt"])
   },
   methods: {
     ...mapMutations(["setPlaintext", "setCiphertext", "endProcessing"]),
@@ -43,13 +46,22 @@ export default {
   watch: {
     isProcessing(newVal) {
       if (newVal) {
+        let keystring = this.keystring.toLowerCase();
+        keystring = filterAlphabets(keystring);
+
         if (this.isEncrypt) {
-          let vigRes = VigenereCipherEncrypt(this.getPlaintext(), removeWhiteSpace(this.keystring));
-          let transRes = TranspositionCipherEncrypt(vigRes);
+          let plaintext = this.getPlaintext().toLowerCase();
+          plaintext = filterAlphabets(plaintext);
+
+          let vigRes = VigenereCipherEncrypt(plaintext, keystring);
+          let transRes = TranspositionCipherEncrypt(vigRes.toLowerCase());
           this.setCiphertext(transRes);
         } else {
-          let transRes = TranspositionCipherDecrypt(this.getCiphertext())
-          let vigRes = VigenereCipherDecrypt(transRes, removeWhiteSpace(this.keystring));
+          let ciphertext = this.getCiphertext().toLowerCase();
+          ciphertext = filterAlphabets(ciphertext);
+
+          let transRes = TranspositionCipherDecrypt(ciphertext);
+          let vigRes = VigenereCipherDecrypt(transRes, keystring);
           this.setPlaintext(vigRes);
         }
 
@@ -57,7 +69,7 @@ export default {
       }
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

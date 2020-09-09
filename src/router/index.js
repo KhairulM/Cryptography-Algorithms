@@ -35,7 +35,7 @@ const routes = [
         path: "super-encryption",
         component: () => import("@/components/SuperEncryption"),
         name: "superEncryption"
-      },
+      }
     ]
   }
 ];
